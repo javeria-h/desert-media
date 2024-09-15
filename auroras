@@ -1,0 +1,36 @@
+import time
+import board
+import neopixel
+
+
+led = neopixel.NeoPixel(board.NEOPIXEL, 1)
+led.brightness = 0.3
+
+#colors for the auroras (green,purple,pink and blue)
+aurora_colors = [(0, 255, 0),(128, 0, 128),(255, 105, 180),(0, 0, 139)]
+
+#gradually changing the color (fading)
+def fade_color(current_color, next_color, steps, step_delay):
+    for step in range(steps):
+        red = int(current_color[0] + (next_color[0] - current_color[0]) * step / (steps - 1))
+        green = int(current_color[1] + (next_color[1] - current_color[1]) * step / (steps - 1))
+        blue = int(current_color[2] + (next_color[2] - current_color[2]) * step / (steps - 1))
+        led.fill((red, green, blue))
+        time.sleep(step_delay)
+
+#total duration
+animation_duration = 30
+#transition time of colors
+color_cycle_time = 3    
+steps = 50             
+step_delay = color_cycle_time / steps  
+
+
+start_time = time.monotonic()
+while time.monotonic() - start_time < animation_duration:
+    for i in range(len(aurora_colors)):
+        next_color = aurora_colors[(i + 1) % len(aurora_colors)] 
+        fade_color(aurora_colors[i], next_color, steps, step_delay)
+
+#turn off the light at the end
+led.fill((0, 0, 0))
